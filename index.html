@@ -271,20 +271,26 @@
     <div class="notes" id="notes-grid"></div>
 
     <div class="section-head">
-      <div><h2>How Each Recommendation Would Affect Self-Sufficiency</h2>
-        <p class="section-note">Modeled effect of each recommendation on its own, starting from the actual data. Use the buttons to view one at a time or all three together.</p></div>
-      <div class="toggle-row" id="rec-toggle">
-        <button class="toggle-btn" data-rec="rec1">Rec 1: Winter Supply</button>
-        <button class="toggle-btn" data-rec="rec2">Rec 2: Daylight Alignment</button>
-        <button class="toggle-btn" data-rec="rec3">Rec 3: Overnight Battery</button>
-        <button class="toggle-btn" data-rec="all">All Separately</button>
-        <button class="toggle-btn active" data-rec="combined">All Three Combined</button>
+      <div><h2>How Each Recommendation Would Affect Self-Sufficiency and Solar Offset</h2>
+        <p class="section-note">Modeled effect of each recommendation on its own, starting from the actual data. Use the top row to pick which recommendation(s) to view, and the bottom row to switch between the two self-sufficiency measures.</p></div>
+      <div>
+        <div class="toggle-row" id="rec-toggle">
+          <button class="toggle-btn" data-rec="rec1">Rec 1: Winter Supply</button>
+          <button class="toggle-btn" data-rec="rec2">Rec 2: Daylight Alignment</button>
+          <button class="toggle-btn" data-rec="rec3">Rec 3: Overnight Battery</button>
+          <button class="toggle-btn" data-rec="all">All Separately</button>
+          <button class="toggle-btn active" data-rec="combined">All Three Combined</button>
+        </div>
+        <div class="toggle-row" id="metric-toggle" style="margin-top:8px;">
+          <button class="toggle-btn active" data-metric="selfsuff">Self-Sufficiency</button>
+          <button class="toggle-btn" data-metric="offset">Solar Offset</button>
+        </div>
       </div>
     </div>
     <div class="row halves">
       <div class="panel">
-        <h3>Self-Sufficiency: Actual vs. Modeled</h3>
-        <p class="note">Solar-covered consumption divided by total consumption, matched to the same 15-minute interval. Same measure used in the Solar & Grid tab.</p>
+        <h3 id="rec-chart-title">Self-Sufficiency: Actual vs. Modeled</h3>
+        <p class="note" id="rec-chart-note">Solar-covered consumption divided by total consumption, matched to the same 15-minute interval. Same measure used in the Solar & Grid tab.</p>
         <div class="chart-box short"><canvas id="recChart"></canvas></div>
       </div>
       <div class="panel">
@@ -293,7 +299,7 @@
           <thead><tr><th>Metric</th><th>Actual</th><th>Rec 1</th><th>Rec 2</th><th>Rec 3</th><th>All Three Combined</th></tr></thead>
           <tbody id="rec-tbody"></tbody>
         </table>
-        <p class="note" style="margin-top:12px;" id="rec-caption">Rec 1 models 4 kW of added panel capacity (the middle of the 3 to 5 kW range). Rec 2 models moving the 66 evening/night sessions to daytime hours, where charging currently runs about 55% solar-covered. Rec 3 models a battery that fully covers Night-bucket charging (1,200 kWh/year) from otherwise-exported daytime solar; same-day exports were large enough to do this in roughly 3 out of 4 cases in the data. The Combined column applies Rec 1 and Rec 2 together (extra capacity plus shifted charging, using the higher daytime solar share that the extra capacity produces); Rec 3 is not stacked on top since Rec 2 already moves all night charging into daylight hours, leaving nothing for a battery to cover. Only Rec 1 (and therefore Combined) adds new energy to the system, so those are the only two that close the annual net energy gap; Rec 2 and Rec 3 alone improve timing match but leave the annual gap unchanged.</p>
+        <p class="note" style="margin-top:12px;" id="rec-caption">Rec 1 models 4 kW of added panel capacity (the middle of the 3 to 5 kW range). Rec 2 models moving the 66 evening/night sessions to daytime hours, where charging currently runs about 55% solar-covered. Rec 3 models a battery that fully covers Night-bucket charging (1,200 kWh/year) from otherwise-exported daytime solar; same-day exports were large enough to do this in roughly 3 out of 4 cases in the data. The Combined column applies Rec 1 and Rec 2 together (extra capacity plus shifted charging, using the higher daytime solar share that the extra capacity produces); Rec 3 is not stacked on top since Rec 2 already moves all night charging into daylight hours, leaving nothing for a battery to cover. Only Rec 1 (and therefore Combined) adds new production, so Solar Offset only moves for those two columns; Rec 2 and Rec 3 alone change nothing about Solar Offset since they do not add any energy, only retime when existing solar is used, which is exactly why Self-Sufficiency and Solar Offset can disagree.</p>
       </div>
     </div>
 
@@ -372,7 +378,8 @@ const kpiOverview = [
   {label:'Total Production', value: fmt0(kpis.total_prod)+' kWh'},
   {label:'Total Consumption', value: fmt0(kpis.total_cons)+' kWh'},
   {label:'Net Energy Gap', value: (kpis.net_gap<0?'\u2212':'') + fmt0(Math.abs(kpis.net_gap))+' kWh', cls:'bad'},
-  {label:'Self-Sufficiency', value: pct(recs.actual.selfsuff_precise), cls:'good'},
+  {label:'Self-Sufficiency', value: pct(recs.actual.selfsuff_precise), cls:'good', sub:'solar used the instant it was made ÷ consumption'},
+  {label:'Solar Offset (Annual)', value: pct(kpis.selfsuff), sub:'total production ÷ total consumption, ignores timing'},
   {label:'Total Sessions', value: kpis.total_sessions, sub: daysUsed+' of 336 days used'},
   {label:'Avg Charging Hrs/Day', value: fmt2(kpis.avg_hrs_day), sub: 'vs. '+kpis.benchmark+' rural benchmark'},
   {label:'Overnight Sessions', value: pct(kpis.pct_overnight), sub:'of all sessions'},
@@ -561,7 +568,8 @@ new Chart(document.getElementById('seasonChart'), { type:'line', data:{ labels: 
 
 // ---- Net-zero KPIs ----
 const kpiNetzero = [
-  {label:'Actual Self-Sufficiency', value: pct(recs.actual.selfsuff_precise), cls:'good', sub:'solar-covered consumption ÷ total consumption'},
+  {label:'Self-Sufficiency', value: pct(recs.actual.selfsuff_precise), cls:'good', sub:'solar-covered consumption ÷ total consumption, matched by 15-min interval'},
+  {label:'Solar Offset (Annual)', value: pct(kpis.selfsuff), sub:'total production ÷ total consumption, ignores timing'},
   {label:'Net Energy Gap', value: fmt0(Math.abs(kpis.net_gap))+' kWh', cls:'bad', sub:'over the full year'},
   {label:'Avg Charging Hrs/Day', value: fmt2(kpis.avg_hrs_day), sub:'vs. '+kpis.benchmark+' rural benchmark'},
   {label:'Winter Months Below 30% Self-Suff.', value:'4', sub:'Nov, Dec, Jan, Feb'},
@@ -576,21 +584,41 @@ kpiNetzero.forEach(k=>{
 // ---- Recommendation impact comparison ----
 const recColors = {actual:'#8FA6B2', rec1:'#C99A2E', rec2:'#3F5A6B', rec3:'#4C7357', combined:'#7A3B3E'};
 const recLabels = {actual:'Actual', rec1:'Rec 1', rec2:'Rec 2', rec3:'Rec 3', combined:'All Three Combined'};
+const metricInfo = {
+  selfsuff: {
+    title: 'Self-Sufficiency: Actual vs. Modeled',
+    note: 'Solar-covered consumption divided by total consumption, matched to the same 15-minute interval. Same measure used in the Solar & Grid tab.',
+    axis: '% of consumption from solar (self-sufficiency)',
+    getValue: k => recs[k].selfsuff_precise*100,
+  },
+  offset: {
+    title: 'Solar Offset: Actual vs. Modeled',
+    note: 'Total annual production divided by total annual consumption. Ignores timing, the number a solar quote or net-metering bill would typically show.',
+    axis: '% of consumption offset by annual production',
+    getValue: k => (recs[k].production/recs[k].consumption)*100,
+  },
+};
+let currentMetric = 'selfsuff';
+let currentRecView = 'combined';
 
 let recChart;
-function buildRecChart(view){
+function buildRecChart(view, metric){
+  currentRecView = view; currentMetric = metric;
   const ctx = document.getElementById('recChart');
   if(recChart) recChart.destroy();
   const keys = view==='all' ? ['actual','rec1','rec2','rec3'] : ['actual', view];
   const labels = keys.map(k=>recLabels[k]);
-  const data = keys.map(k=>(recs[k].selfsuff_precise*100).toFixed(1));
+  const info = metricInfo[metric];
+  const data = keys.map(k=>info.getValue(k).toFixed(1));
   const colors = keys.map(k=>recColors[k]);
   recChart = new Chart(ctx, {
     type:'bar',
     data:{ labels, datasets:[{ data, backgroundColor:colors, borderRadius:6 }] },
     options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
-      scales:{ y:{ title:{display:true,text:'% of consumption from solar'}, grid:{color:'#E4E6D9'}, min:0 }, x:{grid:{display:false}} } }
+      scales:{ y:{ title:{display:true,text:info.axis}, grid:{color:'#E4E6D9'}, min:0 }, x:{grid:{display:false}} } }
   });
+  document.getElementById('rec-chart-title').textContent = info.title;
+  document.getElementById('rec-chart-note').textContent = info.note;
 }
 
 function renderRecTable(){
@@ -599,27 +627,40 @@ function renderRecTable(){
     ['Solar-covered consumption', 'solar_covered', 'kWh'],
     ['Self-sufficiency', 'selfsuff_precise', 'pct'],
     ['Annual production', 'production', 'kWh'],
+    ['Solar offset', null, 'offset'],
     ['Net energy gap', 'net_gap', 'kWh_abs'],
   ];
   const tbody = document.getElementById('rec-tbody');
   tbody.innerHTML = '';
   rows.forEach(([label, key, kind])=>{
-    const fmtVal = v => kind==='pct' ? pct(v) : kind==='kWh_abs' ? fmt0(Math.abs(v))+' kWh' : fmt0(v)+' kWh';
+    const fmtVal = (rk) => {
+      if(kind==='pct') return pct(recs[rk][key]);
+      if(kind==='kWh_abs') return fmt0(Math.abs(recs[rk][key]))+' kWh';
+      if(kind==='offset') return (recs[rk].production/recs[rk].consumption*100).toFixed(1)+'%';
+      return fmt0(recs[rk][key])+' kWh';
+    };
     const tr = document.createElement('tr');
     tr.innerHTML = `<td style="font-family:'Inter',sans-serif;">${label}</td>
-      <td>${fmtVal(recs.actual[key])}</td><td>${fmtVal(recs.rec1[key])}</td>
-      <td>${fmtVal(recs.rec2[key])}</td><td>${fmtVal(recs.rec3[key])}</td><td>${fmtVal(recs.combined[key])}</td>`;
+      <td>${fmtVal('actual')}</td><td>${fmtVal('rec1')}</td>
+      <td>${fmtVal('rec2')}</td><td>${fmtVal('rec3')}</td><td>${fmtVal('combined')}</td>`;
     tbody.appendChild(tr);
   });
 }
 
-buildRecChart('combined');
+buildRecChart('combined','selfsuff');
 renderRecTable();
 document.querySelectorAll('#rec-toggle .toggle-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     document.querySelectorAll('#rec-toggle .toggle-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
-    buildRecChart(btn.dataset.rec);
+    buildRecChart(btn.dataset.rec, currentMetric);
+  });
+});
+document.querySelectorAll('#metric-toggle .toggle-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#metric-toggle .toggle-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    buildRecChart(currentRecView, btn.dataset.metric);
   });
 });
 
