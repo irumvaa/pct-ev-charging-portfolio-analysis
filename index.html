@@ -159,6 +159,7 @@
           <div class="toggle-row" id="monthly-toggle">
             <button class="toggle-btn active" data-mode="energy">Energy (kWh)</button>
             <button class="toggle-btn" data-mode="selfsuff">Self-sufficiency %</button>
+            <button class="toggle-btn" data-mode="offset">Solar Offset %</button>
           </div>
         </div>
         <div class="chart-box tall"><canvas id="monthlyChart"></canvas></div>
@@ -407,11 +408,16 @@ function buildMonthlyChart(mode){
       ]}, options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index', intersect:false},
         plugins:{legend:{display:false}},
         scales:{ y:{title:{display:true,text:'kWh'}, grid:{color:'#E4E6D9'}}, y1:{position:'right', grid:{drawOnChartArea:false}, title:{display:true,text:'Net kWh'}} } } });
-  } else {
+  } else if(mode==='selfsuff'){
     monthlyChart = new Chart(ctx, { type:'line', data:{ labels: monthLabels, datasets:[
         {label:'Self-sufficiency %', data: monthly.map(m=>(m.selfsuff*100).toFixed(1)), borderColor:'#4C7357', backgroundColor:'rgba(76,115,87,0.15)', fill:true, tension:0.35, pointRadius:3}
       ]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
-        scales:{ y:{title:{display:true,text:'% of consumption from solar'}, grid:{color:'#E4E6D9'}, min:0} } } });
+        scales:{ y:{title:{display:true,text:'% of consumption from solar (self-sufficiency)'}, grid:{color:'#E4E6D9'}, min:0} } } });
+  } else {
+    monthlyChart = new Chart(ctx, { type:'line', data:{ labels: monthLabels, datasets:[
+        {label:'Solar Offset %', data: monthly.map(m=>(m.prod/m.cons*100).toFixed(1)), borderColor:'#7A3B3E', backgroundColor:'rgba(122,59,62,0.15)', fill:true, tension:0.35, pointRadius:3}
+      ]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+        scales:{ y:{title:{display:true,text:'% of consumption offset by monthly production'}, grid:{color:'#E4E6D9'}, min:0} } } });
   }
 }
 buildMonthlyChart('energy');
