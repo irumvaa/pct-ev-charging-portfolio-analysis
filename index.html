@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PCT EV Charging Portfolio — Eastern Kentucky</title>
+<title>PCT EV Charging Portfolio, Eastern Kentucky</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -131,9 +131,9 @@
     <path d="M0,150 Q120,110 240,138 T480,122 T720,140 T960,112 T1220,136" fill="none" stroke="#CFD3BE" stroke-width="1.5"/>
   </svg>
   <div class="wrap hero-inner">
-    <p class="eyebrow">Mountain Association &middot; Eastern Kentucky &middot; PCT EV Charging Portfolio</p>
-    <h1>Sun and grid, sharing one charger in the hills</h1>
-    <p class="hero-sub">Fifteen-minute SolarEdge readings from Aug 1, 2025 through Jul 2, 2026 — every charging session found, timed, and checked against how much of it the sun could cover.</p>
+    <p class="eyebrow">Mountain Association. Energy Team. PCT Charging Portfolio</p>
+    <h1>EV Charging Station Performance Analysis</h1>
+    <p class="hero-sub">Solar and grid data from a hybrid EV charging station, Aug 1, 2025 to Jul 2, 2026. Built from 15-minute SolarEdge readings: how often the charger is used, when, and how much of that came from solar.</p>
     <nav class="tabs">
       <button class="tab-btn active" data-view="overview">Overview</button>
       <button class="tab-btn" data-view="usage">Usage Patterns</button>
@@ -167,7 +167,7 @@
       </div>
       <div class="panel">
         <h3>Year-End Energy Balance</h3>
-        <p class="note">Share of total consumption met by the sun vs. the grid, Aug 2025&ndash;Jul 2026.</p>
+        <p class="note">How much of total consumption came from solar versus the grid, Aug 2025 to Jul 2026.</p>
         <div class="chart-box short"><canvas id="balanceDonut"></canvas></div>
         <div class="legend-row">
           <span><i class="dot" style="background:var(--gold)"></i>From solar</span>
@@ -180,8 +180,8 @@
   <!-- ============ USAGE PATTERNS ============ -->
   <section class="view" id="view-usage">
     <div class="section-head">
-      <div><h2>A year of charging, one day at a time</h2>
-        <p class="section-note">Each cell is a day. Darker means more hours of charging that day. Hover a cell for the full breakdown.</p></div>
+      <div><h2>Daily Charging Activity</h2>
+        <p class="section-note">Each cell is one day. Darker means more charging hours that day. Hover a cell for details.</p></div>
     </div>
     <div class="panel">
       <div class="cal-wrap"><div class="cal-grid" id="cal-grid"></div></div>
@@ -193,8 +193,8 @@
     </div>
 
     <div class="section-head">
-      <div><h2>Which day of the week draws the most charging</h2>
-        <p class="section-note">Weekends stand out — consistent with visitor/travel traffic rather than steady weekday commuter charging.</p></div>
+      <div><h2>Charging Sessions by Day of Week</h2>
+        <p class="section-note">Weekend usage is much higher than weekday usage, which points to visitor and travel traffic rather than regular weekday commuting.</p></div>
       <div class="toggle-row" id="dow-toggle">
         <button class="toggle-btn active" data-metric="sessions">Sessions</button>
         <button class="toggle-btn" data-metric="hours">Total hours</button>
@@ -204,8 +204,8 @@
     <div class="panel"><div class="chart-box"><canvas id="dowChart"></canvas></div></div>
 
     <div class="section-head">
-      <div><h2>When charging actually happens</h2>
-        <p class="section-note">Morning and afternoon line up with sunlight. Overnight is rare, but once it starts it tends to run long.</p></div>
+      <div><h2>Charging Sessions by Time of Day</h2>
+        <p class="section-note">Morning and afternoon charging line up with solar hours. Overnight charging is rare, but when it happens it tends to run longer.</p></div>
       <div class="toggle-row" id="tod-toggle">
         <button class="toggle-btn active" data-metric="sessions">Sessions</button>
         <button class="toggle-btn" data-metric="hours">Total hours</button>
@@ -219,8 +219,8 @@
     <div class="tod-cards" id="tod-cards"></div>
 
     <div class="section-head">
-      <div><h2>Sessions and charging hours over the year</h2>
-        <p class="section-note">Weekly totals across all 49 weeks in the dataset — a longer view of usage than any single month.</p></div>
+      <div><h2>Weekly Charging Trends</h2>
+        <p class="section-note">Weekly totals across all 49 weeks in the data, a longer view than any single month gives.</p></div>
     </div>
     <div class="row halves">
       <div class="panel"><h3 style="font-size:14px;">Sessions per week</h3><div class="chart-box short"><canvas id="weeklySessChart"></canvas></div></div>
@@ -231,8 +231,8 @@
   <!-- ============ SOLAR & GRID ============ -->
   <section class="view" id="view-solar">
     <div class="section-head">
-      <div><h2>Where the site's power actually comes from, month by month</h2>
-        <p class="section-note">Gold = consumption met directly by solar. Slate = consumption met by grid import. The thin line above is solar exported to the grid (production the site didn't use itself).</p></div>
+      <div><h2>Monthly Energy Source Breakdown</h2>
+        <p class="section-note">Gold is consumption met directly by solar. Slate is consumption met by the grid. The line shows solar sent back to the grid, production the site didn't use itself.</p></div>
     </div>
     <div class="panel"><div class="chart-box tall"><canvas id="flowChart"></canvas></div></div>
 
@@ -250,8 +250,8 @@
     </div>
 
     <div class="section-head">
-      <div><h2>Why winter is harder: average solar output by hour</h2>
-        <p class="section-note">Average production at each hour of day, grouped by season. Winter's curve is both lower and narrower — less power, over fewer daylight hours.</p></div>
+      <div><h2>Seasonal Solar Production by Hour of Day</h2>
+        <p class="section-note">Average production by hour of day, grouped by season. Winter is both lower and shorter: less power, over fewer daylight hours. That is why self-sufficiency drops in winter.</p></div>
     </div>
     <div class="panel"><div class="chart-box tall"><canvas id="seasonChart"></canvas></div></div>
   </section>
@@ -263,13 +263,13 @@
     <div class="section-head"><div><h2>Key Findings</h2></div></div>
     <div class="panel"><ul class="findings-list" id="findings-list"></ul></div>
 
-    <div class="section-head"><div><h2>Field Notes: Getting to Net Zero</h2>
+    <div class="section-head"><div><h2>Recommendations for Net-Zero Operation</h2>
       <p class="section-note">Ranked by where the gap actually is, based on the data in the other tabs.</p></div></div>
     <div class="notes" id="notes-grid"></div>
 
     <footer style="padding-top:24px;">
       Method: a 15-minute interval counts as EV charging when total Consumption exceeds 10 kW; consecutive flagged
-      intervals are grouped into one session. Data source: SolarEdge monitoring export, Aug 1, 2025&ndash;Jul 2, 2026.
+      intervals are grouped into one session. Data source: SolarEdge monitoring export, Aug 1, 2025 to Jul 2, 2026.
       All charts on this page are built from the same combined dataset as the companion Excel workbook.
     </footer>
   </section>
@@ -277,8 +277,8 @@
   <!-- ============ SESSION LOG ============ -->
   <section class="view" id="view-log">
     <div class="section-head">
-      <div><h2>Every charging session, in one table</h2>
-        <p class="section-note">All 338 detected sessions. Click a column header to sort; use the box to filter by date, day, or time of day.</p></div>
+      <div><h2>Session Log</h2>
+        <p class="section-note">All 338 detected charging sessions. Click a column header to sort; use the search box to filter by date, day, or time of day.</p></div>
     </div>
     <div class="table-controls">
       <input type="text" class="search-box" id="log-search" placeholder="Try 'December 2, 2025', 'Saturday', 'Dec 2025', 'night'...">
@@ -544,20 +544,20 @@ kpiNetzero.forEach(k=>{
 });
 
 const findings = [
- "<b>Usage pattern:</b> 338 charging sessions over 336 days (about 1/day on average, on the 175 days actually used). Average session length is 1.47 hours; the longest single session ran 14.25 hours.",
- "<b>Time of day:</b> 40% of sessions happen in the morning and 40% in the afternoon, when solar is available. Only 4.7% (16 of 338) occur overnight, and on the 15 nights with overnight charging there is on average just 1.07 sessions per night — one continuous charge, not repeated on/off cycling.",
- "<b>Day of week:</b> Saturday sees the most charging by far — 66 sessions (20% of all sessions) totaling 158.5 hours, and the longest average session of any day (2.4 hrs). Sunday is second. Weekdays are lower and fairly even, pointing to weekend travel through the area rather than steady local commuter charging.",
- "<b>Benchmark:</b> This site averages 1.47 charging hrs/day vs. the 1.2 hrs/day typical of an average rural charger — somewhat higher utilization than typical.",
- "<b>Solar vs. consumption:</b> 24,233 kWh produced against 31,983 kWh consumed — a 7,750 kWh gap (about 76% self-sufficiency overall). The gap is concentrated in Nov&ndash;Feb; Apr&ndash;Sep run near or above net-zero.",
+ "<b>Usage pattern:</b> 338 charging sessions over 336 days, about one a day on average, on the 175 days the charger was actually used. Average session length is 1.47 hours. The longest single session ran 14.25 hours.",
+ "<b>Time of day:</b> 40% of sessions happen in the morning and 40% in the afternoon, when solar is available. Only 4.7% (16 of 338) happen overnight, and on the 15 nights with overnight charging there is on average just 1.07 sessions a night: one continuous charge, not repeated on and off.",
+ "<b>Day of week:</b> Saturday sees the most charging by far, with 66 sessions (20% of all sessions) totaling 158.5 hours, and the longest average session of any day (2.4 hrs). Sunday is second. Weekdays are lower and fairly even, which points to weekend travel through the area rather than steady local commuter charging.",
+ "<b>Benchmark:</b> This site averages 1.47 charging hours a day against the 1.2 hours a day typical of an average rural charger, somewhat higher use than typical.",
+ "<b>Solar vs. consumption:</b> 24,233 kWh produced against 31,983 kWh consumed, a 7,750 kWh gap (about 76% self-sufficiency overall). The gap is mostly in Nov through Feb; Apr through Sep run near or above net-zero.",
 ];
 const flEl = document.getElementById('findings-list');
 findings.forEach(f=>{ const li = document.createElement('li'); li.innerHTML = f; flEl.appendChild(li); });
 
 const notes = [
-  {n:'01 — WINTER SUPPLY', h:'Close the winter gap first', p:'Nov&ndash;Feb production runs 900&ndash;1,500 kWh/month against 2,800&ndash;4,000 kWh/month of consumption &mdash; nearly the whole annual shortfall. About 3&ndash;5 kW more panel capacity, or a battery charged on summer surplus, would target this directly.'},
-  {n:'02 — DAYLIGHT ALIGNMENT', h:'Nudge the last 20% into daylight', p:'80% of sessions already happen in morning or afternoon sun. A simple time-of-use incentive for the remaining evening/overnight charges would push self-sufficiency up without any new hardware.'},
-  {n:'03 — OVERNIGHT COVERAGE', h:'Size a small battery for the rare long overnight charge', p:'Only 15 of 336 nights saw overnight charging, and it&rsquo;s almost always one continuous ~4-hour session, not repeated on/off. A modest battery sized to that pattern could cover it on stored daytime solar.'},
-  {n:'04 — TRACKING', h:'Re-baseline every 12 months, not every month', p:'Production swings 3&ndash;4&times; between summer and winter. Net-zero progress should be read on a rolling annual basis, and re-checked if EV charging frequency grows.'},
+  {n:'01. WINTER SUPPLY', h:'Address the Winter Production Gap', p:'Nov through Feb production runs 900 to 1,500 kWh a month against 2,800 to 4,000 kWh a month of consumption, which is nearly the whole annual shortfall. About 3 to 5 kW more panel capacity, or battery storage charged from summer surplus, would close most of this gap.'},
+  {n:'02. DAYLIGHT ALIGNMENT', h:'Shift Remaining Sessions to Daylight Hours', p:'80% of sessions already happen in morning or afternoon sun. A time-of-use incentive for the rest, the evening and overnight sessions, would raise self-sufficiency without buying any new hardware.'},
+  {n:'03. OVERNIGHT COVERAGE', h:'Add Battery Storage for Overnight Sessions', p:'Only 15 of 336 nights had overnight charging, and it is almost always one continuous session around 4 hours long, not repeated on and off. A modest battery sized to that pattern could cover those charges with stored daytime solar.'},
+  {n:'04. TRACKING', h:'Track Progress on a Rolling Annual Basis', p:'Production swings 3 to 4 times between summer and winter. Net-zero progress should be checked on a rolling 12-month basis, not month to month, and revisited if charging picks up.'},
 ];
 const noteEl = document.getElementById('notes-grid');
 notes.forEach(n=>{
