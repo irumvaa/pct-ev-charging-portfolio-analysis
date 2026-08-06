@@ -311,7 +311,8 @@
         <p class="section-note">All 367 detected charging sessions. Click a column header to sort; use the search box to filter by date, day, or time of day.</p></div>
     </div>
     <div class="table-controls">
-      <input type="text" class="search-box" id="log-search" placeholder="Try 'December 2, 2025', 'Saturday', 'Dec 2025', 'night'...">
+      <input type="text" class="search-box" id="log-search" placeholder="Try 'weekend', 'over 2 hours', 'winter', 'under 10 kW', 'session 42'...">
+      <span class="table-meta" id="log-search-hint" style="cursor:help;" title="Also try: month/day/year in any format, day of week, morning/afternoon/evening/night, long/short sessions, full solar / no solar">?</span>
       <span class="table-meta" id="log-count"></span>
     </div>
     <div class="table-wrap">
@@ -730,6 +731,82 @@ function parseSmartQuery(raw){
     const todGuess = fuzzyMatchWord(w, TODS);
     if(todGuess){ filters.push(s=>s.tod.toLowerCase()===todGuess); structuredFound = true; return; }
   });
+
+  // ---- Weekend / weekday ----
+  if(/\bweekends?\b/.test(lower)){
+    filters.push(s => s.dow==='Saturday' || s.dow==='Sunday');
+    structuredFound = true;
+  } else if(/\bweekdays?\b/.test(lower)){
+    filters.push(s => s.dow!=='Saturday' && s.dow!=='Sunday');
+    structuredFound = true;
+  }
+
+  // ---- Season ----
+  const seasonMap = {winter:[12,1,2], spring:[3,4,5], summer:[6,7,8], fall:[9,10,11], autumn:[9,10,11]};
+  for(const name in seasonMap){
+    if(new RegExp('\\b'+name+'\\b').test(lower)){
+      const months = seasonMap[name];
+      filters.push(s=>{ const d=new Date(s.date+'T00:00:00'); return months.includes(d.getMonth()+1); });
+      structuredFound = true;
+      break;
+    }
+  }
+
+  // ---- Session ID lookup: "session 42", "id 42", "#42" ----
+  const idM = lower.match(/\b(?:session|id)\s*#?(\d{1,3})\b/) || lower.match(/#(\d{1,3})\b/);
+  if(idM){
+    const targetId = parseInt(idM[1]);
+    filters.push(s=>s.id===targetId);
+    structuredFound = true;
+  }
+
+  // ---- Duration comparisons: "over 2 hours", "under 30 minutes", "at least 1.5 hrs" ----
+  const overWords = '(?:over|above|more than|longer than|greater than|at least|>=|>)';
+  const underWords = '(?:under|below|less than|shorter than|at most|fewer than|<=|<)';
+  const durOver = lower.match(new RegExp(overWords+'\\s*(\\d+(?:\\.\\d+)?)\\s*(hours?|hrs?|h\\b|minutes?|mins?)'));
+  if(durOver){
+    let val = parseFloat(durOver[1]);
+    if(durOver[2][0]==='m') val = val/60;
+    filters.push(s=>s.duration>val);
+    structuredFound = true;
+  }
+  const durUnder = lower.match(new RegExp(underWords+'\\s*(\\d+(?:\\.\\d+)?)\\s*(hours?|hrs?|h\\b|minutes?|mins?)'));
+  if(durUnder){
+    let val = parseFloat(durUnder[1]);
+    if(durUnder[2][0]==='m') val = val/60;
+    filters.push(s=>s.duration<val);
+    structuredFound = true;
+  }
+
+  // ---- Load comparisons: "over 15 kW", "under 10 kw", peak by default, avg if mentioned ----
+  const loadField = /\b(avg|average)\b/.test(lower) ? 'avg_load' : 'peak_load';
+  const loadOver = lower.match(new RegExp(overWords+'\\s*(\\d+(?:\\.\\d+)?)\\s*kw\\b'));
+  if(loadOver){
+    const val = parseFloat(loadOver[1]);
+    filters.push(s=>s[loadField]>val);
+    structuredFound = true;
+  }
+  const loadUnder = lower.match(new RegExp(underWords+'\\s*(\\d+(?:\\.\\d+)?)\\s*kw\\b'));
+  if(loadUnder){
+    const val = parseFloat(loadUnder[1]);
+    filters.push(s=>s[loadField]<val);
+    structuredFound = true;
+  }
+
+  // ---- Qualitative session length (only when no explicit number given) ----
+  if(!durOver && !durUnder){
+    if(/\b(long|lengthy)\b/.test(lower)){ filters.push(s=>s.duration>=2); structuredFound = true; }
+    else if(/\b(short|quick|brief)\b/.test(lower)){ filters.push(s=>s.duration<=0.5); structuredFound = true; }
+  }
+
+  // ---- Solar share qualifiers ----
+  if(/\b(full|100%|all)\s*solar\b|\bfully solar\b/.test(lower)){
+    filters.push(s=>s.solar_share>=0.9);
+    structuredFound = true;
+  } else if(/\bno solar\b|\b0%\s*solar\b|\bzero solar\b/.test(lower)){
+    filters.push(s=>s.solar_share<=0.05);
+    structuredFound = true;
+  }
 
   if(!structuredFound){
     filters.push(s=>{
